@@ -41,8 +41,9 @@ Each link found on a crawled page is checked by:
   returns with a status code of `200 OK`. Any other status code, 
   such as a 404 error or a redirect, is considered a broken link.
 * If the link's URL contains a fragment (the part after the #),
-  the requested page is checked to see if it contains an HTML element
-  with an `id` attribute matching that fragment string. If one cannot be
+  the requested page is checked to see if it contains any HTML element
+  with an `id` attribute matching that fragment string, or an `a` element
+  with a `name` attribute matching that fragment string. If neither are
   found, the link is considered broken. 
 
 Below is an example output. It shows that
@@ -61,6 +62,13 @@ https://nim-lang.github.io/Nim/random.html
 (4) https://nim-lang.github.io/Nim/random.html#rand,HSlice[T,T]
 (4) https://nim-lang.github.io/Nim/random.html#rand,Rand,HSlice[T,T]
 ```
+
+The script is not perfect as it may return false positives. For example,
+some webpages handle scrolling to fragment targets with JavaScript instead 
+of using element attributes, which this script does not account for.
+Also, following redirects is currently not supported. But the script works
+pretty well and you can examine the results to verify if the links are
+actually broken.
 
 ## License
 
