@@ -20,6 +20,7 @@ const maxRetries = 10
 
 let tagPattern = re"""<([^>"]*"[^"]*")*>"""
 let idPattern = re""" id="([^"]+)""""
+let namePattern = re""" name="([^"]+)""""
 let hrefPattern = re""" href="([^"]+)""""
 let lineNumberPattern = re"^L\d+$"
 
@@ -37,6 +38,11 @@ proc idsAndHrefs(html: string): (HashSet[string], seq[string]) =
       result[0].incl(tag[a + 5 .. b - 1])
 
     if tag.startsWith("<a "):
+      # Also include the name attribute on "a" elements in the IDs.
+      (a, b) = tag.findBounds(namePattern)
+      if a != -1:
+        result[0].incl(tag[a + 7 .. b - 1])
+
       (a, b) = tag.findBounds(hrefPattern)
       if a != -1:
         result[1].add(tag[a + 7 .. b - 1])
