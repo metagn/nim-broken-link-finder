@@ -9,8 +9,8 @@ const crawlBase = "https://nim-lang.github.io/Nim/"
 
 # URLs starting with any of these strings will be ignored.
 const ignoredUrls = [
-  "https://github.com/nim-lang/Nim/tree/devel/",
-  "https://github.com/nim-lang/Nim/edit/devel/",
+  "https://github.com/nim-lang/Nim/tree/devel/", # "Source" links.
+  "https://github.com/nim-lang/Nim/edit/devel/", # "Edit" links.
 ]
 
 const outputPath = "broken_links.txt"
@@ -29,7 +29,6 @@ type
   Tasks = Deque[Task]
   BrokenLinks = Table[string, CountTable[string]]
 
-
 proc idsAndHrefs(html: string): (HashSet[string], seq[string]) =
   var a, b: int
   for tag in html.findall(tagPattern):
@@ -47,10 +46,8 @@ proc idsAndHrefs(html: string): (HashSet[string], seq[string]) =
       if a != -1:
         result[1].add(tag[a + 7 .. b - 1])
 
-
 proc decodeUrlAndHtmlEntities(url: string): string =
   result = decodeUrl(url).replace("&lt;", "<").replace("&gt;", ">").replace("&amp;", "&")
-
 
 proc addTasks(tasks: var Tasks, addedUrls: var HashSet[string], curUrl: string, hrefs: seq[string]) =
   for href in hrefs:
@@ -68,7 +65,6 @@ proc addTasks(tasks: var Tasks, addedUrls: var HashSet[string], curUrl: string, 
       addedUrls.incl(dest)
 
     tasks.addLast((source: curUrl, dest: dest, fragment: fragment))
-
 
 proc logBrokenLinks(f: File, source: string, brokenLinks: BrokenLinks) =
   if source in brokenLinks:
@@ -98,7 +94,7 @@ proc logBrokenLinks(f: File, source: string, brokenLinks: BrokenLinks) =
 
     f.writeLine("")
 
-proc main =
+proc main() =
   let outputFile = open(outputPath, fmWrite)
   defer: outputFile.close()
 
@@ -119,6 +115,7 @@ proc main =
     if task.source.len == 0:
       # Crawl new URL.
       echo "Tasks remaining: ", tasks.len, " - Requesting: ", task.dest
+
       var
         res: Response
         retry = 0
@@ -167,6 +164,5 @@ proc main =
         brokenLinks.mgetOrPut(task.source, initCountTable[string]()).inc(destWithFragment)
 
   outputFile.logBrokenLinks(prevSource, brokenLinks)
-
 
 main()
