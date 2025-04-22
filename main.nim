@@ -2,10 +2,10 @@ include prelude
 import algorithm, deques, httpclient, re, sequtils, strformat, uri
 
 # Where crawling will start from.
-const crawlStart = "https://nim-lang.github.io/Nim/"
+const crawlStart {.strdefine.} = "https://nim-lang.github.io/Nim/"
 
 # Any visited URL that starts with `crawlBase` will also be checked for broken links.
-const crawlBase = "https://nim-lang.github.io/Nim/"
+const crawlBase {.strdefine.} = "https://nim-lang.github.io/Nim/"
 
 # URLs starting with any of these strings will be ignored.
 const ignoredUrls = [
@@ -166,3 +166,12 @@ proc main() =
   outputFile.logBrokenLinks(prevSource, brokenLinks)
 
 main()
+
+proc checkCI() =
+  let content = readFile(outputPath)
+  if content.len != 0:
+    echo "Broken links:"
+    echo content
+    quit(1)
+
+checkCI()

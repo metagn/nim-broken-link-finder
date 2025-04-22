@@ -1,0 +1,30 @@
+name: nim-broken-link-finder
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+  workflow_dispatch:
+
+jobs:
+  test-devel-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: jiro4989/setup-nim-action@v2
+
+      - name: run
+        run: nim r -d:ssl main
+
+  test-stable-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: jiro4989/setup-nim-action@v2
+
+      - name: run
+        run: nim r -d:ssl -d:crawlStart=https://nim-lang.org/docs/ -d:crawlBase=https://nim-lang.org/docs/ main
