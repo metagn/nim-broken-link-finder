@@ -16,6 +16,11 @@ jobs:
       - uses: actions/checkout@v3
       - uses: jiro4989/setup-nim-action@v2
 
+      - name: install pcre dependency
+        run: |
+          sudo apt-get update
+          sudo apt-get install libpcre3 libpcre3-dev
+
       - name: run
         run: nim r -d:ssl main
 
@@ -25,6 +30,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: jiro4989/setup-nim-action@v2
+
+      - name: install pcre dependency
+        run: |
+          sudo apt-get update
+          sudo apt-get install libpcre3 libpcre3-dev
 
       - name: run
         run: nim r -d:ssl -d:crawlStart=https://nim-lang.org/docs/ -d:crawlBase=https://nim-lang.org/docs/ main
