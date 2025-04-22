@@ -9,8 +9,8 @@ const crawlBase {.strdefine.} = "https://nim-lang.github.io/Nim/"
 
 # URLs starting with any of these strings will be ignored.
 const ignoredUrls = [
-  "https://github.com/nim-lang/Nim/tree/devel/", # "Source" links.
-  "https://github.com/nim-lang/Nim/edit/devel/", # "Edit" links.
+  "https://github.com/nim-lang/Nim/tree/", # "Source" links.
+  "https://github.com/nim-lang/Nim/edit/", # "Edit" links.
 ]
 
 const outputPath = "broken_links.txt"
