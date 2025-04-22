@@ -116,30 +116,32 @@ proc main() =
       # Crawl new URL.
       echo "Tasks remaining: ", tasks.len, " - Requesting: ", task.dest
 
-      var
-        res: Response
-        retry = 0
+      block doRequest:
+        var
+          res: Response
+          retry = 0
 
-      while true:
-        try:
-          res = newHttpClient(timeout = timeoutMillisecs).request(task.dest)
-          break
-        except:
-          echo getCurrentExceptionMsg()
-          inc retry
-          if retry > maxRetries:
-            echo "Max retries reached"
-            raise
+        while true:
+          try:
+            res = newHttpClient(timeout = timeoutMillisecs).request(task.dest)
+            break
+          except:
+            echo getCurrentExceptionMsg()
+            inc retry
+            if retry > maxRetries:
+              echo "Max retries reached"
+              failedUrls.incl(task.dest)
+              break doRequest
 
-      if res.status == "200 OK":
-        let html = res.body
-        let (ids, hrefs) = idsAndHrefs(html)
-        cachedIds[task.dest] = ids
-        if task.dest.startsWith(crawlBase):
-          tasks.addTasks(addedUrls, task.dest, hrefs)
+        if res.status == "200 OK":
+          let html = res.body
+          let (ids, hrefs) = idsAndHrefs(html)
+          cachedIds[task.dest] = ids
+          if task.dest.startsWith(crawlBase):
+            tasks.addTasks(addedUrls, task.dest, hrefs)
 
-      else:
-        failedUrls.incl(task.dest)
+        else:
+          failedUrls.incl(task.dest)
 
     else:
       if task.source != prevSource:
